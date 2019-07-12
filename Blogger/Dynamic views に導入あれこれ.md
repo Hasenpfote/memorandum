@@ -1,4 +1,4 @@
-# Blogger の Dynamic views に導入あれこれ  
+# Dynamic views に導入あれこれ  
 
 
 
