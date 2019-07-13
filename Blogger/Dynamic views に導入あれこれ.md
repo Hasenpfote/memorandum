@@ -103,6 +103,35 @@
 
 
 
+## StackEdit → Blogger
+
+1. 言語のハイライト
+
+   `hilight.js`で対応
+
+2. 数式の表示
+
+   `MathJax` で対応。
+
+   ただし、`StackEdit` は `Katex` を利用しているため二重表示されるなど問題がある。
+
+   これを回避するには、`Blogger` にアップロードするときに
+
+   [Menu] → [File properties]  の [YAML properties] に下記を設定する。 
+
+   ```yaml
+   extensions:
+     katex:
+       enabled: false
+   status: draft
+   ```
+
+   ※ アップロード時以外は有効にしないと数式がレンダリングされないので注意。
+
+3. その他の表示調整
+
+   カスタム CSS で対応
+
 ## ...
 
 
