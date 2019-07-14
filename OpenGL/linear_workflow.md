@@ -41,7 +41,9 @@
       glTexImage2D(GL_TEXTURE_2D, 0, GL_SRGB8_ALPHA8, w, h, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
       ```
 
-      これで生成されたテクスチャはフェッチ時にハードウェアが`sRGB`→`Linear`に変換してくれる。
+      これで生成されたテクスチャはハードウェアが`sRGB`→`Linear`に変換してくれる。
+
+      [glTexImage2D](https://www.khronos.org/registry/OpenGL-Refpages/gl4/html/glTexImage2D.xhtml)
 
       
 
