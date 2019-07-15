@@ -129,6 +129,8 @@ else
 
 ※故にデバッグ表示に三項演算子などを利用すると混乱するので注意
 
+cf. [glGetFramebufferAttachmentParameteriv](https://www.khronos.org/registry/OpenGL-Refpages/gl4/html/glGetFramebufferAttachmentParameter.xhtml)
+
 
 
 ## 3. 最終的にディスプレイに出力される直前に非線形色空間に戻す
