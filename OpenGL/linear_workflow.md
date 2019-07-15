@@ -43,7 +43,7 @@
 
       これで生成されたテクスチャはハードウェアが`sRGB`→`Linear`に変換してくれる。
 
-      [glTexImage2D](https://www.khronos.org/registry/OpenGL-Refpages/gl4/html/glTexImage2D.xhtml)
+      cf. [glTexImage2D](https://www.khronos.org/registry/OpenGL-Refpages/gl4/html/glTexImage2D.xhtml)
 
       
 
@@ -93,6 +93,44 @@
 
 
 
+**確認方法**
+
+下記は0番のカラーバッファだけが有効な`FBO`
+
+```c++
+GLuint fbo = 0;
+glGenFramebuffers(1, &fbo);
+glBindFramebuffer(GL_FRAMEBUFFER, fbo);
+glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, texture, 0);
+```
+
+次のように確認を行う。
+
+```c++
+glBindFramebuffer(GL_FRAMEBUFFER, fbo);
+// ...
+GLint encoding = 0;
+glGetFramebufferAttachmentParameteriv(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_FRAMEBUFFER_ATTACHMENT_COLOR_ENCODING, &encoding);
+if(encoding == GL_LINEAR)
+{
+    // (1) Linear
+}
+else if(encoding == GL_SRGB)
+{
+    // (2) sRGB
+}
+else
+{
+    // (3) If nothing is attached to the fbo.
+}
+```
+
+(3) は、カラーバッファがアタッチされていない場合に該当。
+
+※故にデバッグ表示に三項演算子などを利用すると混乱するので注意
+
+
+
 ## 3. 最終的にディスプレイに出力される直前に非線形色空間に戻す
 
 `Linear`→`sRGB`に変換。
@@ -107,6 +145,8 @@
 
    `Linear`な`FBO`には影響がないらしいので、全体が単純なら初期化時に一度設定しておくだけでも良い。
 
+   **※ ただし、`GL_FRAMEBUFFER_SRGB`が正常に機能しないハードウェアもあるらしい。**
+
    
 
 2. フラグメントシェーダーで行う
@@ -115,13 +155,72 @@
 
    バックバッファへ出力するシェーダーが複数ある場合はすべてに必要となる。
 
-   ので、大したことをしなくても可能ならポストプロセス処理を最低１つ設けると楽になる。
+   故に大したことをしなくても可能ならポストプロセス処理を最低１つ設けると楽になる。
 
-**※ 1 については、`GL_FRAMEBUFFER_SRGB` が機能しないハードウェアもあるらしい。**
+
+
+## #. デフォルト・フレームバッファ
+
+**2.**で確認した方法をデフォルト・フレームバッファについても行ってみる。
+
+調査環境は Windows10 / NVIDIA GeForce GTX 760 (v430.86)  。
+
+```c++
+const std::unordered_map<GLenum, std::string> default_buffer =
+{
+    {GL_FRONT_LEFT, "GL_FRONT_LEFT"},
+    {GL_FRONT_RIGHT, "GL_FRONT_RIGHT"},
+    {GL_BACK_LEFT, "GL_BACK_LEFT"},
+    {GL_BACK_RIGHT, "GL_BACK_RIGHT"}
+};
+
+const std::unordered_map<GLint, std::string> color_encoding =
+{
+    {GL_LINEAR, "GL_LINEAR"},
+    {GL_SRGB, "GL_SRGB"}
+};
+
+glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+for(auto& pair : default_buffer)
+{
+    GLint encoding = 0;
+    glGetFramebufferAttachmentParameteriv(GL_FRAMEBUFFER, pair.first, GL_FRAMEBUFFER_ATTACHMENT_COLOR_ENCODING, &encoding);
+
+    auto it = color_encoding.find(encoding);
+    std::string name = (it != color_encoding.cend())? it->second : "Unknown";
+    std::cout << "default_buffer: " << pair.second << " encoding: " << name << std::endl;
+}
+```
+
+他の影響がないように調査前に必ず`glBindFramebuffer(GL_FRAMEBUFFER, 0);`を忘れずに。
+
+```shell
+default_buffer: GL_FRONT_LEFT encoding: GL_LINEAR
+default_buffer: GL_FRONT_RIGHT encoding: GL_LINEAR
+default_buffer: GL_BACK_LEFT encoding: GL_LINEAR
+default_buffer: GL_BACK_RIGHT encoding: GL_LINEAR
+```
+
+通常、デフォルト・フレームバッファは`sRGB`を想定するので、この結果は明らかに問題がある。
+
+しかし実際の環境で`GL_FRAMEBUFFER_SRGB`を有効にすると`Linear`→`sRGB`への変換が期待どおり行われる。
+
+
+
+問題提起されてから随分と放置されているようなので、他環境(ハードウェア・OS)も考慮するなら`GL_FRAMEBUFFER_SRGB`は選択肢から外す必要がありそうだ。
 
 
 
 ### 参考:
 
 1. [LearnOpenGL - Gamma Correction](https://learnopengl.com/Advanced-Lighting/Gamma-Correction)
+
+2. [March 2015 OpenGL drivers status and FB sRGB conversions](https://www.g-truc.net/post-0720.html)
+
+3. [GL_FRAMEBUFFER_SRGB functions incorrectly](https://devtalk.nvidia.com/default/topic/776591/opengl/gl_framebuffer_srgb-functions-incorrectly/)
+
+   
+
+   
 
