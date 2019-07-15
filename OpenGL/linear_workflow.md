@@ -68,6 +68,42 @@
    3. `HDRI` イメージ
 
       そもそも`Linear`。
+      
+      `OpenEXR`などの半精度浮動小数点数の場合、
+      
+      ```c++
+      glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB16F, w, h, 0, GL_RGB, GL_HALF_FLOAT, data);
+      ```
+      
+      または、
+      
+      ```c++
+      glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA16F, w, h, 0, GL_RGBA, GL_HALF_FLOAT, data);
+      ```
+      
+      
+      
+      `OpenEXR`や`Radiance`などの単精度浮動小数点数の場合、
+      
+      ```c++
+      glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB32F, w, h, 0, GL_RGB, GL_FLOAT, data);
+      ```
+      
+      または、
+      
+      ```c++
+      glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA32F, w, h, 0, GL_RGBA, GL_FLOAT, data);
+      ```
+      
+      
+      
+      cf. [OpenEXR](https://www.openexr.com/)
+      
+      cf. [Radiance](https://www.radiance-online.org/)
+      
+      cf. [Radiance File Formats](https://floyd.lbl.gov/radiance/refer/filefmts.pdf)
+      
+      cf. [The RADIANCE Picture File Format](https://floyd.lbl.gov/radiance/refer/Notes/picture_format.html)
 
    
 
