@@ -199,7 +199,7 @@ cf. [glGetFramebufferAttachmentParameteriv](https://www.khronos.org/registry/Ope
 
 ## #. デフォルト・フレームバッファ
 
-**2.** で確認した方法をデフォルト・フレームバッファについても行ってみる。
+**3.1** の挙動を確認するため **2.** で確認した方法をデフォルト・フレームバッファについても行ってみる。
 
 調査環境は Windows10 / NVIDIA GeForce GTX 760 (v430.86)  。
 
@@ -362,11 +362,9 @@ color_encoding: GL_LINEAR
 
 通常、デフォルトフレームバッファは`sRGB`を想定しそうなものだが、どうもそうではないようだ。
 
-実環境で`GL_FRAMEBUFFER_SRGB`を有効にすると`Linear`→`sRGB`への変換が期待どおり行われる。
+実環境で`GL_FRAMEBUFFER_SRGB`を有効にすると何かしらの変換は行われる。
 
-一部の他社ハードウェアやOSでは一致するかは不明。
-
-※仕様(NVIDIA)に一部の他社ハードウェアが追い付いていない？
+これが期待すべき`Linear`→`sRGB`変換かは要調査。
 
 
 
